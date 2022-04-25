@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,7 +56,7 @@ public class studentController {
 
     //post - api/v1/students
     @PostMapping("/students")
-    public ResponseEntity createStudent(@RequestBody student newStudent) throws ParseException {
+    public ResponseEntity createStudent(@Valid @RequestBody student newStudent) throws ParseException {
         if (newStudent == null || newStudent.getStudentId() == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing the student . . .");
         // . . . throw the exception no content

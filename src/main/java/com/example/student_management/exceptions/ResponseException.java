@@ -19,19 +19,19 @@ public class ResponseException {
     }
 
     public Date getTimestamp() {
-        return timestamp;
+        return this.timestamp;
     }
 
     public String getMessage() {
-        return message;
+        return this.message;
     }
 
     public String getDetails() {
-        return details;
+        return this.details;
     }
 
     public Boolean getSuccess(){
-        return success;
+        return this.success;
     }
 
 }
