@@ -1,9 +1,11 @@
 package com.example.student_management.controllers;
 
 import com.example.student_management.entities.student;
-import com.example.student_management.exceptions.StudentNotFoundException;
+import com.example.student_management.exceptions.studentException.StudentExistingException;
+import com.example.student_management.exceptions.studentException.StudentNoContentException;
+import com.example.student_management.exceptions.studentException.StudentNotFoundException;
+import com.example.student_management.exceptions.studentException.WrongFacultyIdException;
 import com.example.student_management.repositories.studentRepository;
-import com.example.student_management.entities.faculty;
 import com.example.student_management.repositories.facultyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -16,7 +18,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/v1")
@@ -48,24 +49,23 @@ public class studentController {
         student stu = studentRepository.findByStudentId(studentId);
         if (stu != null)
             return ResponseEntity.status(HttpStatus.OK).body(stu);
-//        return ResponseEntity.status(HttpStatus.OK).body(stu.getId());
 //        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found student");
-        throw new StudentNotFoundException("id - " + studentId+" not found!");
-        /// . . . throw the exception Not found
+        throw new StudentNotFoundException("id - " + studentId + " not found!");
     }
 
     //post - api/v1/students
     @PostMapping("/students")
     public ResponseEntity createStudent(@Valid @RequestBody student newStudent) throws ParseException {
-        if (newStudent == null || newStudent.getStudentId() == null)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing the student . . .");
-        // . . . throw the exception no content
+        if (newStudent.getName() == null)
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing the student . . .");
+            throw new StudentNoContentException("student is missing . . .");
         //check studentId is exists
         if (studentRepository.findByStudentId(newStudent.getStudentId()) != null)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Student is existing . . .");
-        // . . . throw the exception isExisting
-        if(facultyRepository.findByFacultyId(newStudent.getFacultyId())==null)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("facultyId is wrong . . . ");
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Student is existing . . .");
+            throw new StudentExistingException("Student " + newStudent.getStudentId() + " is existing . . .");
+        if (facultyRepository.findByFacultyId(newStudent.getFacultyId()) == null)
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("facultyId is wrong . . . ");
+            throw new WrongFacultyIdException("faculty " + newStudent.getFacultyId() + " is wrong . . .");
         newStudent.setStudentId(newStudent.getStudentId().toLowerCase());
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date(System.currentTimeMillis());
@@ -80,8 +80,8 @@ public class studentController {
     @PutMapping("/students/{studentId}")
     public ResponseEntity updateStudent(@RequestBody student updatedStudent, @PathVariable String studentId) throws ParseException {
         if (updatedStudent == null || updatedStudent.getName() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing the student . . .");
-            /// . . . throw the exception no content
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing the student . . .");
+            throw new StudentNoContentException("student is missing . . .");
         }
         student stu = studentRepository.findByStudentId(studentId);
         if (stu != null) {
@@ -92,15 +92,15 @@ public class studentController {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             Date date = new Date(System.currentTimeMillis());
             stu.setUpdatedAt(formatter.parse(formatter.format(date)));
-            if(facultyRepository.findByFacultyId(stu.getFacultyId())==null)
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("facultyId is wrong . . . ");
+            if (facultyRepository.findByFacultyId(stu.getFacultyId()) == null)
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("facultyId is wrong . . . ");
+                throw new WrongFacultyIdException("faculty " + stu.getFacultyId() + " is wrong . . .");
             studentRepository.save(stu);
             return ResponseEntity.status(HttpStatus.OK).body(stu);
         }
         //student not found
 //        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("student " + studentId + " not found . . .");
-        throw new StudentNotFoundException("id - " + studentId+" not found!");
-        // . . . throw the exception Not found
+        throw new StudentNotFoundException("id - " + studentId + " not found!");
     }
 
     //delete - api/v1/students/:studentId
@@ -114,8 +114,7 @@ public class studentController {
         }
         //student not found
 //        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("student " + studentId + " not found . . .");
-        throw new StudentNotFoundException("id - " + studentId+" not found!");
-        // . . . throw the exception Not found
+        throw new StudentNotFoundException("id - " + studentId + " not found!");
     }
 
 }

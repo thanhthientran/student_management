@@ -1,5 +1,6 @@
 package com.example.student_management.exceptions;
 
+import com.example.student_management.exceptions.studentException.StudentNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,20 +40,18 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         });
         ResponseException exceptionResponse = new ResponseException(
                 false,
-//                "Validation failed",
-                errMess[0].toString()
+                errMess[0].toString()       //"Validation failed",
                 ,ex.getMessage()
                 ,new Date());
         return new ResponseEntity(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
-    protected  ResponseEntity handleAllException(Exception ex,
-                                                 WebRequest webRequest){
+    protected  ResponseEntity handleAllException(Exception ex, WebRequest webRequest){
+        List<String> errMess = new ArrayList<String>();
         ResponseException exceptionResponse = new ResponseException(
                 false,
-//                "validation failed",
-                ex.getMessage(),
+                ex.getMessage(),//"something is wrong . . .",
                 webRequest.getDescription(false),
                 new Date());
         return new ResponseEntity(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);

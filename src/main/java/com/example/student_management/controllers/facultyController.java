@@ -2,6 +2,9 @@ package com.example.student_management.controllers;
 
 import com.example.student_management.entities.faculty;
 import com.example.student_management.entities.student;
+import com.example.student_management.exceptions.falcutyException.FacultyExistingException;
+import com.example.student_management.exceptions.falcutyException.FacultyNoContentException;
+import com.example.student_management.exceptions.falcutyException.FacultyNotFoundException;
 import com.example.student_management.repositories.facultyRepository;
 import com.example.student_management.repositories.studentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,14 +64,14 @@ public class facultyController {
 
     //post - api/v1/faculties
     @PostMapping("/faculties")
-    public ResponseEntity createFaculty(@RequestBody faculty newFaculty) throws ParseException {
-        if (newFaculty == null || newFaculty.getFacultyId() == null)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing the student . . .");
-        // . . . throw the exception no content
+    public ResponseEntity createFaculty(@Valid @RequestBody faculty newFaculty) throws ParseException {
+        if (newFaculty.getName() == null)
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing the faculty . . .");
+            throw new FacultyNoContentException("faculty is missing . . .");
         //check studentId is exists
         if (facultyRepository.findByFacultyId(newFaculty.getFacultyId()) != null)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Student is existing . . .");
-        // . . . throw the exception isExisting
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("faculty is existing . . .");
+            throw new FacultyExistingException("faculty is existing . . .");
         newFaculty.setFacultyId(newFaculty.getFacultyId().toLowerCase());
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date(System.currentTimeMillis());
@@ -79,10 +83,10 @@ public class facultyController {
 
     //put - api/v1/faculties/:facultyId
     @PutMapping("/faculties/{facultyId}")
-    public ResponseEntity updateFaculty ( @RequestBody faculty updatedFaculty, @PathVariable String facultyId ) throws ParseException {
-        if (updatedFaculty == null || updatedFaculty.getName() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing the Faculty . . .");
-            /// . . . throw the exception no content
+    public ResponseEntity updateFaculty ( @Valid @RequestBody faculty updatedFaculty, @PathVariable String facultyId ) throws ParseException {
+        if (updatedFaculty.getName() == null) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing the Faculty . . .");
+            throw new FacultyNoContentException("faculty is missing . . .");
         }
         faculty fac = facultyRepository.findByFacultyId(facultyId);
         if (fac != null) {
@@ -94,8 +98,8 @@ public class facultyController {
             return ResponseEntity.status(HttpStatus.OK).body(fac);
         }
         //student not found
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("faculty " + facultyId + " not found . . .");
-        // . . . throw the exception Not found
+//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("faculty " + facultyId + " not found . . .");
+        throw new FacultyNotFoundException("faculty " + facultyId+" not found!");
     }
 
     @DeleteMapping("/faculties/{facultyId}")
@@ -122,7 +126,7 @@ public class facultyController {
             return ResponseEntity.status(HttpStatus.OK).body(fac);
         }
         //faculty not found
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("faculty " + facultyId + " not found . . .");
-        // . . . throw the exception Not found
+//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("faculty " + facultyId + " not found . . .");
+        throw new FacultyNotFoundException("faculty " + facultyId+" not found!");
     }
 }
