@@ -18,7 +18,6 @@ public class faculty {
 
     @Field(value = "facultyId")
     @NotNull
-    @Size(min = 2, message = "facultyId should have atleast 2 characters")
     private String facultyId;
 
     @Field(value = "name")

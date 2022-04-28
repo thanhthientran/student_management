@@ -8,6 +8,6 @@ import java.util.List;
 @EnableMongoAuditing
 public interface studentRepository extends MongoRepository<student, String> {
     student findByStudentId(String studentId);
-    List<student> findByName (String name);
+//    List<student> findByName (String name);
     List<student> findByFacultyId (String facultyId);
 }

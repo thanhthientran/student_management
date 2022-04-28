@@ -53,6 +53,11 @@ public class studentController {
         throw new StudentNotFoundException("id - " + studentId + " not found!");
     }
 
+    @GetMapping("/students/nofaculty")
+    public List<student> getStudentNoFaculty(){
+        return this.studentRepository.findByFacultyId("");
+    }
+
     //post - api/v1/students
     @PostMapping("/students")
     public ResponseEntity createStudent(@Valid @RequestBody student newStudent) throws ParseException {
@@ -63,9 +68,11 @@ public class studentController {
         if (studentRepository.findByStudentId(newStudent.getStudentId()) != null)
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Student is existing . . .");
             throw new StudentExistingException("Student " + newStudent.getStudentId() + " is existing . . .");
-        if (facultyRepository.findByFacultyId(newStudent.getFacultyId()) == null)
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("facultyId is wrong . . . ");
-            throw new WrongFacultyIdException("faculty " + newStudent.getFacultyId() + " is wrong . . .");
+//        if (facultyRepository.findByFacultyId(newStudent.getFacultyId()) == null)
+////            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("facultyId is wrong . . . ");
+//            throw new WrongFacultyIdException("faculty " + newStudent.getFacultyId() + " is wrong . . .");
+        if(newStudent.getFacultyId() == null)
+            newStudent.setFacultyId("");
         newStudent.setStudentId(newStudent.getStudentId().toLowerCase());
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date(System.currentTimeMillis());
@@ -78,7 +85,7 @@ public class studentController {
 
     //put - api/v1/students/:studentId
     @PutMapping("/students/{studentId}")
-    public ResponseEntity updateStudent(@RequestBody student updatedStudent, @PathVariable String studentId) throws ParseException {
+    public ResponseEntity updateStudent(@Valid @RequestBody student updatedStudent, @PathVariable String studentId) throws ParseException {
         if (updatedStudent == null || updatedStudent.getName() == null) {
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing the student . . .");
             throw new StudentNoContentException("student is missing . . .");
